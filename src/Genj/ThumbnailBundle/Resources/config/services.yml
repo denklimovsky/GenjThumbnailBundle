@@ -2,6 +2,7 @@ parameters:
     liip_imagine.controller.class: Genj\ThumbnailBundle\Controller\ImagineController
     liip_imagine.cache.manager.class: Genj\ThumbnailBundle\Imagine\Cache\CacheManager
     liip_imagine.cache.resolver.web_path.class: Genj\ThumbnailBundle\Imagine\Cache\Resolver\WebPathResolver
+    liip_imagine.cache.resolver.aws_s3.class: Genj\ThumbnailBundle\Imagine\Cache\Resolver\AwsS3Resolver
 
 services:
     liip_imagine.filter.loader.format:
@@ -25,3 +26,21 @@ services:
             - @liip_imagine.cache.manager
         tags:
             - { name: doctrine.event_subscriber }
+
+    genj_thumbnail.amazon_s3:
+        class: Aws\S3\S3Client
+        factory_class: Aws\S3\S3Client
+        factory_method:  factory
+        arguments:
+            -
+                region: %genj_thumbnail.amazon.s3.region%
+                version: 'latest'
+                credentials: {key: %genj_thumbnail.amazon.s3.key%, secret: %genj_thumbnail.amazon.s3.secret%}
+
+    genj_thumbnail.imagine.cache.resolver.amazon_s3:
+        class: Genj\ThumbnailBundle\Imagine\Cache\Resolver\AwsS3Resolver
+        arguments:
+            - "@genj_thumbnail.amazon_s3"
+            - "%genj_thumbnail.amazon.s3.bucket%"
+        tags:
+            - { name: 'liip_imagine.cache.resolver', resolver: 'amazon_s3' }

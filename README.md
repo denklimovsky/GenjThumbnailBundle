@@ -37,9 +37,17 @@ Features:
 
 * Add this to app/config/parameters.yml:
 
-
+```
     domain: holland-herald.com
-
+    # Resolver options:
+    # 'default' -> use the local filesystem
+    # 'amazon_s3' -> use the S3 bucket, this makes the extra configuration required
+    genj_thumbnail.cache.resolver: 'default'
+    genj_thumbnail.amazon.s3.key: 'AKIAJEN2IWS7RG4AJMVA'
+    genj_thumbnail.amazon.s3.secret: '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'
+    genj_thumbnail.amazon.s3.bucket: 'static.staging.vogue.nl'
+    genj_thumbnail.amazon.s3.region: 'eu-west-1'
+```
 
 * Add this to app/config/config.yml:
 
@@ -60,6 +68,7 @@ Features:
 ```
     liip_imagine:   
         driver: imagick
+        cache: %genj_thumbnail.cache.resolver%
         filter_sets:
 
             # used in admin and in listings
@@ -83,6 +92,20 @@ Features:
                 filters:
                     relative_resize: { widen: 1600 }
                     format: ['jpg']
+
+        resolvers:
+                amazon_s3:
+                    aws_s3:
+                        client_config:
+                            key:     %genj_thumbnail.amazon.s3.key%
+                            secret:  %genj_thumbnail.amazon.s3.secret%
+                            region:  %genj_thumbnail.amazon.s3.region%
+                            version: 'latest'
+                        bucket:     %genj_thumbnail.amazon.s3.bucket%
+                        get_options:
+                            Scheme: 'https'
+                        put_options:
+                            CacheControl: 'max-age=86400'
 
 ```
 

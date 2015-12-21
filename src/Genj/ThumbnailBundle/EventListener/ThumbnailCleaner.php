@@ -65,6 +65,9 @@ class ThumbnailCleaner implements EventSubscriber {
 
         $entityClass = new \ReflectionClass($entity);
         $metaData = $this->annotationDriver->loadMetadataForClass($entityClass);
+
+//        var_dump($entity); exit;
+
         if (!is_object($metaData) || !property_exists($metaData, 'fields')) {
             return;
         }
@@ -109,6 +112,8 @@ class ThumbnailCleaner implements EventSubscriber {
      */
     public function deleteCachedThumbnails($entity, $uploadableField)
     {
+        var_dump('delete');
+
         $filters = array_keys($this->filterConfig->all());
 
         foreach ($filters as $filter) {
