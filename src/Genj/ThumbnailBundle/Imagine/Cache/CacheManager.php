@@ -5,6 +5,7 @@ namespace Genj\ThumbnailBundle\Imagine\Cache;
 use Doctrine\Common\Util\ClassUtils;
 use Symfony\Component\DependencyInjection\Container;
 use Liip\ImagineBundle\Imagine\Cache\CacheManager as BaseCacheManager;
+use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
 /**
  * Class CacheManager
@@ -45,7 +46,7 @@ class CacheManager extends BaseCacheManager
         $parameters['_format']    = $this->getFormat($filter);
 
         // If we are on upload. or static. subdomain, generate the url with that subdomain
-        $host      = $this->container->get('request')->getHost();
+        $host      = $this->container->get('request_stack')->getCurrentRequest()->getHost();
         $parts     = explode('.', $host);
         $subdomain = $parts[0];
 
@@ -57,7 +58,7 @@ class CacheManager extends BaseCacheManager
             $urlGenerator = $this->container->get('genj_frontend_url.routing.frontend.generator.url_generator');
             $url          = $urlGenerator->generateFrontendUrl('genj_thumbnail', $parameters, $preview);
         } else {
-            $url = $this->router->generate('genj_thumbnail', $parameters, true);
+            $url = $this->router->generate('genj_thumbnail', $parameters, UrlGeneratorInterface::ABSOLUTE_PATH);
         }
 
         return $url;
